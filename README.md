@@ -1,17 +1,4 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-
-  
-
-  
-# Trip Planner App :earth_africa:	:mountain_snow:
+# AI Trip Planner App 🌍✈️🏔️
 
 <div style="text-align: center;"> 
  
@@ -48,13 +35,51 @@ Currently, two official plugins are available:
 https://full-stack-ai-trip-planner.vercel.app/
 
 
-## Setup .env file
-### :key: Environment Variables
+## 🚀 Getting Started
 
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Google Cloud Console account for API keys
 
-```js
-VITE_GOOGLE_PLACES_API_KEY
-VITE_GOOGLE_GEMINI_AI_API_KEY
-VITE_GOOGLE_AUTH_CLIENT_ID
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ai-trip-planner.git
+   cd ai-trip-planner
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Setup Environment Variables**
+   - Copy `.env.example` to `.env`
+   - Get your API keys from Google Cloud Console:
+     - Google Places API Key
+     - Google Gemini AI API Key  
+     - Google OAuth Client ID
+   - Fill in your API keys in the `.env` file
+
+4. **Setup Firebase**
+   - Create a Firebase project
+   - Enable Firestore Database
+   - Update `src/service/firebaseConfig.js` with your Firebase config
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+### 🔑 Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_GOOGLE_PLACES_API_KEY=your_google_places_api_key
+VITE_GOOGLE_GEMINI_AI_API_KEY=your_google_gemini_ai_api_key
+VITE_GOOGLE_AUTH_CLIENT_ID=your_google_auth_client_id
 ``` 
 
