@@ -10,13 +10,26 @@ function UserTripCard({trip}) {
   },[trip])
 
   const GetPlaceImg=async()=>{
+    const placesKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+    if(!placesKey || placesKey === 'undefined'){
+      console.error("❌ VITE_GOOGLE_PLACES_API_KEY is not set");
+      return;
+    }
+    
     const data={
       textQuery:trip?.userSelection?.location
     }
-    const result= await GetPlaceDetails(data).then(resp=>{
-      const PhotoUrl=PHOTO_REF_URL.replace('{NAME}',resp.data.places[0].photos[3].name)
-      setPhotoUrl(PhotoUrl);
-    })
+    try {
+      const result= await GetPlaceDetails(data).then(resp=>{
+        if(resp?.data?.places?.[0]?.photos?.[3]?.name){
+          const PhotoUrl=PHOTO_REF_URL.replace('{NAME}',resp.data.places[0].photos[3].name)
+          setPhotoUrl(PhotoUrl);
+          console.log("✅ Google Places API is working!");
+        }
+      })
+    } catch (error) {
+      console.error("❌ Google Places API Error:", error);
+    }
   }
   return (
    <Link to={'/view-trip/'+trip?.id}>

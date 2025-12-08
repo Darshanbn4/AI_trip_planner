@@ -54,18 +54,38 @@ function CreateTrip() {
       toast("Please fill all details!")
       return ;
     }
+    
+    // Check if API keys are configured
+    const geminiKey = import.meta.env.VITE_GOOGLE_GEMINI_AI_API_KEY;
+    if(!geminiKey || geminiKey === 'undefined'){
+      toast.error("Gemini AI API key is missing! Please check your .env file.");
+      console.error("❌ VITE_GOOGLE_GEMINI_AI_API_KEY is not set");
+      return;
+    }
+    
     toast("Form generated.");
     setLoading(true);
-    const FINAL_PROMPT=AI_PROMPT
-    .replace('{location}',formData?.location)
-    .replace('{totalDays}',formData?.totalDays)
-    .replace('{traveler}',formData?.traveler)
-    .replace('{budget}',formData?.budget)
+    try {
+      const FINAL_PROMPT=AI_PROMPT
+      .replace('{location}',formData?.location)
+      .replace('{totalDays}',formData?.totalDays)
+      .replace('{traveler}',formData?.traveler)
+      .replace('{budget}',formData?.budget)
 
-    const result=await chatSession.sendMessage(FINAL_PROMPT);
-    // console.log("--",result?.response?.text());
-    setLoading(false);
-    SaveAiTrip(result?.response?.text());
+      const result=await chatSession.sendMessage(FINAL_PROMPT);
+      console.log("✅ Gemini AI API Key is working!");
+      // console.log("--",result?.response?.text());
+      setLoading(false);
+      SaveAiTrip(result?.response?.text());
+    } catch (error) {
+      setLoading(false);
+      console.error("❌ Gemini AI API Error:", error);
+      if(error.message?.includes('API_KEY')){
+        toast.error("Invalid Gemini AI API key. Please check your .env file.");
+      } else {
+        toast.error("Failed to generate trip. Please try again.");
+      }
+    }
   } 
 
   const SaveAiTrip=async(TripData) => {
@@ -83,15 +103,26 @@ function CreateTrip() {
   }
 
   const GetUserProfile=(tokenInfo)=>{
-    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`,{
+    const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
+    if(!clientId || clientId === 'undefined' || clientId === 'dummy-client-id'){
+      toast.error("Google OAuth Client ID is missing! Please check your .env file.");
+      console.error("❌ VITE_GOOGLE_AUTH_CLIENT_ID is not set");
+      return;
+    }
+    
+    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,{
       headers: {
        Authorization: `Bearer ${tokenInfo?.access_token}`,
        Accept:'Application/json'
       }
-    }).then((resp) => {console.log(resp);
+    }).then((resp) => {
+      console.log("✅ Google OAuth is working!", resp);
       localStorage.setItem('user',JSON.stringify(resp.data));
       setOpenDialog(false);
       OnGenerateTrip();
+    }).catch((error) => {
+      console.error("❌ Google OAuth Error:", error);
+      toast.error("Failed to authenticate. Please try again.");
     })
   }
 
@@ -109,7 +140,15 @@ function CreateTrip() {
           apiKey={import.meta.env.VITE_GOOGLE_PLACES_API_KEY}
           selectProps={{
             place,
-            onChange:(v)=>{setPlace(v); handleInputChange('location',v.label)}
+            onChange:(v)=>{setPlace(v); handleInputChange('location',v.label)},
+            onError: (error) => {
+              console.error("❌ Google Places API Error:", error);
+              if(!import.meta.env.VITE_GOOGLE_PLACES_API_KEY || import.meta.env.VITE_GOOGLE_PLACES_API_KEY === 'undefined'){
+                toast.error("Google Places API key is missing! Please check your .env file.");
+              } else {
+                toast.error("Google Places API error. Please check your API key.");
+              }
+            }
           }}
         />
        </div>
